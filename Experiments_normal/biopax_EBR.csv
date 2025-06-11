@@ -1,0 +1,11 @@
+LP,F1-OCEL-mean,F1-OCEL-std,RT-OCEL-mean,RT-OCEL-std,F1-CELOE-mean,F1-CELOE-std,RT-CELOE-mean,RT-CELOE-std,F1-Evo-mean,F1-Evo-std,RT-Evo-mean,RT-Evo-std,F1-clip-mean,F1-clip-std,RT-clip-mean,RT-clip-std
+((dna ⊓ (∃DELTA-H.Thing)) ⊔ (pathwayStep ⊓ (∀DB-VERSION.Thing))),,,,,,,,,,,,,,,,
+((pathwayStep ⊓ (∀SPONTANEOUS.Thing)) ⊔ (rna ⊓ (∀PH.Thing))),,,,,,,,,,,,,,,,
+((pathwayStep ⊓ (∀SPONTANEOUS.Thing)) ⊔ (rna ⊓ (∀AVAILABILITY.Thing))),,,,,,,,,,,,,,,,
+(protein ⊓ (∀LEFT.Thing)),,,,,,,,,,,,,,,,
+((complex ⊓ (∀TITLE.Thing)) ⊔ (sequenceInterval ⊓ (∃URL.Thing))),,,,,,,,,,,,,,,,
+((pathwayStep ⊓ (∀DELTA-G.Thing)) ⊔ (transportWithBiochemicalReaction ⊓ (∀CONFIDENCE.Thing))),,,,,,,,,,,,,,,,
+(relationshipXref ⊓ (∀SPONTANEOUS.Thing)),,,,,,,,,,,,,,,,
+(pathwayStep ⊓ (∀SOURCE.Thing)),,,,,,,,,,,,,,,,
+((∀SEQUENCE-INTERVAL-BEGIN.Thing) ⊓ (protein ⊓ (∀EVIDENCE.Thing))),,,,,,,,,,,,,,,,
+((dna ⊓ (∀CONTROLLED.Thing)) ⊔ (pathwayStep ⊓ (∀CELLULAR-LOCATION.Thing))),,,,,,,,,,,,,,,,
