@@ -1,9 +1,9 @@
 
-## Neural Reasoning for Robust Concept Learning
+## DeCaL Reasoner Evaluation for Class Expression Learning
 
-This repository provides the implementation of the Embedding Based Reasoner dubbed EBR. With this repository, once can perform instance retrieval even within an inconsistent knowldege base. EBR leverages KGE to perform reasoning over incomplete and inconsistent knowledge bases (KBs). We employ a neural link predictor to facilitate the retrieval of missing data and handle inconsistencies.
+This experiment demonstrates how to use the **DeCaL** reasoner for class expression learning in Description Logics. The key idea is to show that **DeCaL** can work with **any concept learning algorithm**, and can adapt to different configurations controlled by parameters `p`, `q`, and `r`.
 
-We based our implementation on [Ontolearn](https://github.com/dice-group/Ontolearn). We would like to thank for the readable codebase.
+
 
 ## Installation
 
@@ -17,133 +17,63 @@ unzip LPs.zip
 ```
 Other datasets and learning problems can be manually downloaded from [here](https://drive.google.com/file/d/1LWmrtVQFh2_9eWOUsGZTGVeTkxi3n5pk/view?usp=sharing) 
 
-## Retrieval results on error free datasets 
 
-To reproduce our results on error free datasets, run the commands below
 
-```shell
-python examples/retrieval_eval.py --path_kg "KGs/Family/father.owl"
-# Results of the Father dataset
+## Goal 
 
-python examples/retrieval_eval.py --path_kg "KGs/Family/family-benchmark_rich_background.owl"
-# Results of the Family dataset
-```
+To evaluate the robustness and flexibility of DeCaL as a backend reasoner when plugged into any concept learning system — here using a learning pipeline applied to the Family dataset.
 
-For larger datasets, we have to sample the number of entities and relations. For the experiments to run fast, we need to select the type of instance we are interested from line 136-140 of this [file](examples/retrieval_eval.py). Below we only present how to get results on semnatic Bible but for other datasets can be obtain similarly by adding the corect path to the argument ```--path_kg```.
 
-```shell
-# results on the semnatic bible data
+| Argument                | Description                                                     |
+| ----------------------- | --------------------------------------------------------------- |
+| `--max_runtime`         | Max runtime per learning problem (default: `10` seconds)        |
+| `--lps`                 | Path to normal learning problems (`lps.json`)                   |
+| `--lps_difficult`       | Path to more challenging problems                               |
+| `--kb`                  | Path to the OWL knowledge base (e.g., the Family ontology)      |
+| `--path_pretrained_kge` | Path to pretrained KGE embeddings (optional)                    |
+| `--data_name`           | Name of the dataset (`family` by default)                       |
+| `--reasoner`            | Reasoner used (`EBR`)                            |
+| `--operation`           | Type of operation: `normal`, `incomplete`, or `inconsistent`    |
+| `--use_cache`           | Whether to use a semantic cache (`True`/`False`)                |
+| `--gamma`               | Threshold parameter for the EBR reasoner (default: `0.5`)       |
+| `--p`, `--q`, `--r`     | Parameters for DeCaL                                            |
 
-python examples/retrieval_eval.py --path_kg "KGs/Semantic_bible/semantic_bible.owl" --seed 1 --ratio_sample_nc 1 --ratio_sample_object_prob 1 --path_report "ALCQI_semantic_seed_all_nc.csv"
-# OWLClass expressions
+Other parameters which are ineternal to DeCaL have been fix to:
 
-python examples/retrieval_eval.py --path_kg "KGs/Semantic_bible/semantic_bible.owl" --seed 1 --ratio_sample_nc .5 --ratio_sample_object_prob .5 --path_report "ALCQI_semantic_seed_1_ratio_0.5_unions.csv"
-# OWLObjectUnionOf
+`--embedding_dim`: 32 (Embedding dimension to represents nodes and entities)
 
-python examples/retrieval_eval.py --path_kg "KGs/Semantic_bible/semantic_bible.owl" --seed 1 --ratio_sample_nc 1 --ratio_sample_object_prob 1 --path_report "ALCQI_semantic_seed_1_interALCQI_semantic_seed_all_nc.csv"
-# OWLObjectComplementOf
+`--num_epochs`: 100 Number of Epoch to train DeCaL
 
-python examples/retrieval_eval.py --path_kg "KGs/Semantic_bible/semantic_bible.owl" --seed 1 --ratio_sample_nc .5 --ratio_sample_object_prob .5 --path_report "ALCQI_semantic_seed_1_ratio_0.5_inter.csv"
-# OWLObjectIntersectionOf
+`--learning_rate`: 0.1
 
-python examples/retrieval_eval.py --path_kg "KGs/Semantic_bible/semantic_bible.owl" --seed 1 --ratio_sample_nc .2 --ratio_sample_object_prob .2 --path_report "ALCQI_semantic_seed_1_ratio_02_exits.csv"
-# OWLObjectSomeValuesFrom
+`--batch_size`: 1024
 
-python examples/retrieval_eval.py --path_kg "KGs/Semantic_bible/semantic_bible.owl" --seed 1 --ratio_sample_nc .2 --ratio_sample_object_prob .2 --path_report "ALCQI_semantic_seed_1_ratio_02_forall.csv" 
-# OWLObjectAllValuesFrom
 
-python examples/retrieval_eval.py --path_kg "KGs/Semantic_bible/semantic_bible.owl" --seed 1 --ratio_sample_nc .1 --ratio_sample_object_prob .1 --path_report "ALCQI_semantic_seed_1_ratio_02_min_card.csv"
-# minimum cardinality restrictions, n = {1,2,3} 
+## Example Usage
 
-python examples/retrieval_eval.py --path_kg "KGs/Semantic_bible/semantic_bible.owl" --seed 1 --ratio_sample_nc .1 --ratio_sample_object_prob .1 --path_report "ALCQI_semantic_seed_1_ratio_02_max_card.csv"
-# max cardinality restrictions, n = {1,2,3} 
-```
+To run the experiment with DeCaL and a specific parameter combination:
 
-## To track EBR path for intance retrieval
-```shell
-python examples/EBR_with_tree.py
-```
+```bash
+python examples/concept_learning_evaluation_reasoners.py \
+  --reasoner --p 1 --q 1 --r 1
+  ```
 
-## Results on incompleteness or inconsistencies
+We use a simple triple-loop to run the learning script with all combinations of the DeCaL parameters `p`, `q`, and `r` in `{0, 1}`:
 
-To obtain the incompleteness results, run the following commands:
-
-```shell
-python examples/retrieval_eval_under_incomplete.py --path_kg "KGs/Family/father.owl" --ratio 0.4 --operation "incomplete" --number_of_incomplete_graphs 5
-# Results of the Father dataset
-
-python examples/retrieval_eval_under_incomplete.py --path_kg "KGs/Family/family-benchmark_rich_background.owl" --ratio 0.4 --operation "incomplete" --number_of_incomplete_graphs 5
-# Results of the Family dataset
-
-python examples/retrieval_eval_under_incomplete.py --path_kg "KGs/Semantic_bible/semantic_bible.owl" --ratio 0.4 --operation "incomplete" --number_of_incomplete_graphs 5 --sample Yes
-# Results of the Semantic Bible dataset
-
-python examples/retrieval_eval_under_incomplete.py --path_kg "KGs/Mutagenesis/mutagenesis.owl" --ratio 0.4 --operation "incomplete" --number_of_incomplete_graphs 5 --sample Yes
-# Results of the Mutagenesis dataset
-
-python examples/retrieval_eval_under_incomplete.py --path_kg "KGs/Mutagenesis/mutagenesis.owl" --ratio 0.4 --operation "incomplete" --number_of_incomplete_graphs 5 --sample Yes
-# Results of the Carcinogenesis dataset
-```
-To get the results with other ratio (0.1, 0.2, 0.6, 0.8, 0.9 etc...), just add it after the argument ```--ratio``` and run the same command. For results on inconcistencies, just change the argument ```--operation``` to "inconsistent" (this will not necessary make the KB inconsistent but will add noises in the data at the choosen level). See below for an example on the Father and Family datasets.
-
-```shell
-python examples/retrieval_eval_under_incomplete.py --path_kg "KGs/Family/father.owl" --ratio 0.4 --operation "inconsistent" --number_of_incomplete_graphs 5
-# Results of the Father dataset
-
-python examples/retrieval_eval_under_incomplete.py --path_kg "KGs/Family/family-benchmark_rich_background.owl" --ratio 0.4 --operation "inconsistent" --number_of_incomplete_graphs 5
-# Results of the Family dataset
-```
-
-## Results of the Father dataset
-```shell
-python examples/retrieval_eval.py --path_kg "KGs/Family/father.owl"
+```bash
+for p in 0 1; do
+  for q in 0 1; do
+    for r in 0 1; do
+      python examples/concept_learning_evaluation_reasoners.py --p $p --q $q --r $r
+    done
+  done
+done
 ```
 
 
-## Example of Concepts retrieval results on Father dataset:
+This script runs the learning system 8 times, each with a different configuration of the DeCaL parameters (where p, q, and r vary over 0 and 1). These parameters influence how DeCaL reasons over the knowledge base during concept learning.
 
-|   | Expression             | Type                     | Jaccard Similarity | F1  | Runtime Benefits      | Runtime EBR        | Symbolic Retrieval                                                                                                                                               | EBR Retrieval                                                                                                                                         |
-|---|------------------------|--------------------------|--------------------|-----|-----------------------|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 0 | female ⊓ male          | OWLObjectIntersectionOf   | 1.0                | 1.0 | 0.054    | 0.003    | set()                                                                                                                                                            | set()                                                                                                                                                            |
-| 1 | ∃ hasChild.female       | OWLObjectSomeValuesFrom   | 1.0                | 1.0 | -0.001 | 0.001  | {'http://example.com/father#markus'}                                                                                                                             | {'http://example.com/father#markus'}                                                                                                                             |
-| 2 | person ⊔ (¬person)      | OWLObjectUnionOf         | 1.0                | 1.0 | -0.003  | 0.003   | {'http://example.com/father#martin', 'http://example.com/father#stefan', 'http://example.com/father#markus', 'http://example.com/father#anna', 'http://example.com/father#michelle', 'http://example.com/father#heinz'} | {'http://example.com/father#martin', 'http://example.com/father#stefan', 'http://example.com/father#markus', 'http://example.com/father#anna', 'http://example.com/father#michelle', 'http://example.com/father#heinz'} |
-| 3 | person ⊓ person         | OWLObjectIntersectionOf  | 1.0                | 1.0 | -0.002   | 0.002    | {'http://example.com/father#martin', 'http://example.com/father#stefan', 'http://example.com/father#markus', 'http://example.com/father#anna', 'http://example.com/father#michelle', 'http://example.com/father#heinz'} | {'http://example.com/father#martin', 'http://example.com/father#stefan', 'http://example.com/father#markus', 'http://example.com/father#anna', 'http://example.com/father#michelle', 'http://example.com/father#heinz'} |
-| 4 | person ⊔ person         | OWLObjectUnionOf         | 1.0                | 1.0 | -0.002  | 0.002   | {'http://example.com/father#martin', 'http://example.com/father#stefan', 'http://example.com/father#markus', 'http://example.com/father#anna', 'http://example.com/father#michelle', 'http://example.com/father#heinz'} | {'http://example.com/father#martin', 'http://example.com/father#stefan', 'http://example.com/father#anna', 'http://example.com/father#markus', 'http://example.com/father#michelle', 'http://example.com/father#heinz'} |
 
-```shell
-python examples/retrieval_eval.py --path_kg "KGs/Family/family-benchmark_rich_background.owl"
-# Results of the Family dataset
-```
-
-For larger datasets, we have to sample the number of entities and relations. For the experiments to run fast, we need to select the type of instance we are interested from line 136-140 of this [file](examples/retrieval_eval.py). Below we only present how to get results on semnatic Bible but for other datasets can be obtain similarly by adding the corect path to the argument ```--path_kg```.
-
-```shell
-# results on the semnatic bible data
-
-python examples/retrieval_eval.py --path_kg "KGs/Semantic_bible/semantic_bible.owl" --seed 1 --ratio_sample_nc 1 --ratio_sample_object_prob 1 --path_report "ALCQI_semantic_seed_all_nc.csv"
-# OWLClass expressions
-
-python examples/retrieval_eval.py --path_kg "KGs/Semantic_bible/semantic_bible.owl" --seed 1 --ratio_sample_nc .5 --ratio_sample_object_prob .5 --path_report "ALCQI_semantic_seed_1_ratio_0.5_unions.csv"
-# OWLObjectUnionOf
-
-python examples/retrieval_eval.py --path_kg "KGs/Semantic_bible/semantic_bible.owl" --seed 1 --ratio_sample_nc 1 --ratio_sample_object_prob 1 --path_report "ALCQI_semantic_seed_1_interALCQI_semantic_seed_all_nc.csv"
-# OWLObjectComplementOf
-
-python examples/retrieval_eval.py --path_kg "KGs/Semantic_bible/semantic_bible.owl" --seed 1 --ratio_sample_nc .5 --ratio_sample_object_prob .5 --path_report "ALCQI_semantic_seed_1_ratio_0.5_inter.csv"
-# OWLObjectIntersectionOf
-
-python examples/retrieval_eval.py --path_kg "KGs/Semantic_bible/semantic_bible.owl" --seed 1 --ratio_sample_nc .2 --ratio_sample_object_prob .2 --path_report "ALCQI_semantic_seed_1_ratio_02_exits.csv"
-# OWLObjectSomeValuesFrom
-
-python examples/retrieval_eval.py --path_kg "KGs/Semantic_bible/semantic_bible.owl" --seed 1 --ratio_sample_nc .2 --ratio_sample_object_prob .2 --path_report "ALCQI_semantic_seed_1_ratio_02_forall.csv" 
-# OWLObjectAllValuesFrom
-
-python examples/retrieval_eval.py --path_kg "KGs/Semantic_bible/semantic_bible.owl" --seed 1 --ratio_sample_nc .1 --ratio_sample_object_prob .1 --path_report "ALCQI_semantic_seed_1_ratio_02_min_card.csv"
-# minimum cardinality restrictions, n = {1,2,3} 
-
-python examples/retrieval_eval.py --path_kg "KGs/Semantic_bible/semantic_bible.owl" --seed 1 --ratio_sample_nc .1 --ratio_sample_object_prob .1 --path_report "ALCQI_semantic_seed_1_ratio_02_max_card.csv"
-# max cardinality restrictions, n = {1,2,3} 
-```
 
 ## Concept learning with EBR
 
