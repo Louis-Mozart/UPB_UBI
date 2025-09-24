@@ -21,7 +21,7 @@ Other datasets and learning problems can be manually downloaded from [here](http
 
 ## Goal 
 
-To evaluate the robustness and flexibility of DeCaL as a backend reasoner when plugged into any concept learning system — here using a learning pipeline applied to the Family dataset.
+To evaluate the robustness and flexibility of DeCaL as a backend reasoner when plugged into any concept learning system, here we use a learning pipeline applied to the Family dataset.
 
 
 | Argument                | Description                                                     |
