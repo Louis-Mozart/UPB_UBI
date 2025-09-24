@@ -101,7 +101,7 @@ python examples/concept_learning_evaluation_reasoners.py --reasoner EBR --operat
 
 ## Effect of the threshold
 
-To see the effect of the threhold gamma, run the same codes by adding the argument `--gamma 0.9` which means we are setting a threshold of 0.9. The default threshold is set to 0.5
+To see the effect of the threshold gamma, run the same code by adding the argument `--gamma 0.9`, which means we are setting a threshold of 0.9. The default threshold is set to 0.5
 
 
 ## Example of the concept learning results on the Family dataset
