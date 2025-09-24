@@ -89,9 +89,9 @@ After the `--reaoner` flag, we can choose different other reasoners: `["EBR", "P
 
 To have the results on the inconsistent or incomplete put after the  ```--operation```  argument `inconsistent` or `incomplete`.
 
-The results for other datasets can be obtained in a similar manner by changing the knowledge base argument `--kb` and the corresponding learning problems `--lps`.
-The path to all knowledge bases can be found at `Ontolearn/KGs` and `Ontolearn/datasets` while the learning problems are in `Ontolearn/LPs`.
-For instance the path to the Vicodi dataset is `Ontolearn/datasets/vicodi/kb` and the corresponding LPs can be found at `Ontolearn/datasets/vicodi/training_data/training_data_prep.json`
+The results for other datasets can be obtained similarly by changing the knowledge base argument `--kb` and the corresponding learning problems `--lps`.
+The path to all knowledge bases can be found at `Ontolearn/KGs` and `Ontolearn/datasets`, while the learning problems are in `Ontolearn/LPs`.
+For instance, the path to the Vicodi dataset is `Ontolearn/datasets/vicodi/kb` and the corresponding LPs can be found at `Ontolearn/datasets/vicodi/training_data/training_data_prep.json`
 
 Therefore the result for the inconsistent Vicodi dataset with ratio 0.1 using the EBR reasoner can be obtained by running
 
