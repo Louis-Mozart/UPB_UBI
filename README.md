@@ -40,7 +40,7 @@ To evaluate the robustness and flexibility of DeCaL as a backend reasoner when p
 
 Other parameters which are internal to DeCaL have been fixed to:
 
-`--embedding_dim`: 32 (Embedding dimension to represents nodes and entities)
+`--embedding_dim`: 32 (Embedding dimension to represent nodes and entities)
 
 `--num_epochs`: 100 Number of Epoch to train DeCaL
 
