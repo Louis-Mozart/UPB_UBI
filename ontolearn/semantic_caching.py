@@ -100,19 +100,19 @@ def concept_generator(path_kg):
     unions_unnc = concept_reducer(unnc, opt=OWLObjectUnionOf)
     # (14) UNNC INTERACTION UNNC.
     intersections_unnc = concept_reducer(unnc, opt=OWLObjectIntersectionOf)
-    # (15) \exist r. C s.t. C \in UNNC and r \in R* .
+    # (15) \exist r. C s.t. C \in UNNC and r \in R*.
     exist_unnc = concept_reducer_properties(
         concepts=unnc,
         properties=object_properties,#object_properties_and_inverse,
         cls=OWLObjectSomeValuesFrom,
     )
-    # (16) \forall r. C s.t. C \in UNNC and r \in R* .
+    # (16) \forall r. C s.t. C \in UNNC and r \in R*.
     for_all_unnc = concept_reducer_properties(
         concepts=unnc,
         properties=object_properties,#object_properties_and_inverse,
         cls=OWLObjectAllValuesFrom,
     )
-    # (17) >= n r. C  and =< n r. C, s.t. C \in UNNC and r \in R* .
+    # (17) >= n r. C  and =< n r. C, s.t. C \in UNNC and r \in R*.
     min_cardinality_unnc_1, min_cardinality_unnc_2, min_cardinality_unnc_3 = (
         concept_reducer_properties(
             concepts=unnc,
@@ -131,7 +131,7 @@ def concept_generator(path_kg):
         )
         for i in [1, 2, 3]
     )
-    # (18) \exist r. Nominal s.t. Nominal \in Nominals and r \in R* .
+    # (18) \exist r. Nominal s.t. Nominal \in Nominals and r \in R*.
     exist_nominals = concept_reducer_properties(
         concepts=nominal_combinations,
         properties=object_properties_and_inverse,
@@ -140,7 +140,7 @@ def concept_generator(path_kg):
 
     ###################################################################
 
-    # () Converted to list so that the progress bar works.
+    # () Converted to a list so that the progress bar works.
     random.seed(0)
     if len(intersections_unnc) > 500:
         intersections_unnc = random.sample(intersections_unnc, k=500)
