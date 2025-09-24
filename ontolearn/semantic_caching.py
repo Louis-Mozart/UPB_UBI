@@ -167,7 +167,7 @@ def get_saved_concepts(path_kg, data_name, shuffle):
     cache_dir = f"caching_results_{data_name}"
     os.makedirs(cache_dir, exist_ok=True)
 
-    # Determine the filename based on shuffle flag
+    # Determine the filename based on the shuffle flag
     filename = "shuffled_concepts.pkl" if shuffle else "unshuffled_concepts.pkl"
     save_file = os.path.join(cache_dir, filename)
 
@@ -205,7 +205,7 @@ class CacheWithEviction:
         self.initialized = False  # Track if cache is already initialized
 
     def _evict(self):
-        '''empty the cache when it is full using different strategy'''
+        '''empty the cache when it is full using a different strategy'''
         if len(self.cache) > self.cache_size:
             if self.strategy == 'FIFO':
                 self.cache.popitem(last=False)  # Evict the oldest item (first in)
@@ -389,7 +389,7 @@ def semantic_caching_size(func, cache_size, eviction_strategy, random_seed, cach
             result = cached_result if cached_result is not None else func(*args)
 
         elif isinstance(owl_expression, OWLObjectComplementOf):
-            if cache_type == 'cold': #If it is cold then all complement object are already cached at initialisation time
+            if cache_type == 'cold': #If it is cold, then all complement objects are already cached at initialisation time
                 cached_result_cold = retrieve_from_cache(str_expression)
                 result =  cached_result_cold if cached_result_cold is not None else func(*args)
             else: 
