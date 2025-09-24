@@ -77,7 +77,7 @@ This script runs the learning system 8 times, each with a different configuratio
 
 ## Concept learning with EBR
 
-To get the results on concept learning on error free Family dataset, run
+To get the results on concept learning on the error-free Family dataset, run
 
 ```shell
 python examples/concept_learning_evaluation_reasoners.py --reasoner Pellet --operation normal --kb "KGs/Family/family-benchmark_rich_background.owl" --lps "LPs/Family/lps.json"
