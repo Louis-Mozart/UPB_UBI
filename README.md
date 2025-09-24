@@ -83,7 +83,7 @@ To get the results on concept learning on the error-free Family dataset, run
 python examples/concept_learning_evaluation_reasoners.py --reasoner Pellet --operation normal --kb "KGs/Family/family-benchmark_rich_background.owl" --lps "LPs/Family/lps.json"
 ```
 
-This will run the algorithm of the four comcept learners CELOE, OCEL, CLIP and Evolearner with Pellet as the reasoner on the family dataset.
+This will run the algorithm of the four concept learners CELOE, OCEL, CLIP, and Evolearner with Pellet as the reasoner on the family dataset.
 
 After the `--reaoner` flag we can choose different other reasoners: `["EBR", "Pellet", "HermiT", "JFact", "Openllet", "Structural"]`
 
