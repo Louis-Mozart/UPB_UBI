@@ -726,7 +726,7 @@ def retrieve_other_reasoner(expression, path_kg, name_reasoner='HermiT'):
 
 
 def run_semantic_cache(path_kg:str, path_kge:str, cache_size:int, name_reasoner:str, eviction:str, random_seed:int, cache_type:str, shuffle_concepts:str):
-    '''Return cache performnace with semantics'''
+    '''Return cache performance with semantics'''
 
     symbolic_kb = KnowledgeBase(path=path_kg)
     D = []
@@ -806,7 +806,7 @@ def run_semantic_cache(path_kg:str, path_kge:str, cache_size:int, name_reasoner:
 
 
 def run_non_semantic_cache(path_kg:str, path_kge:str, cache_size:int, name_reasoner:str, shuffle_concepts:str):
-    '''Return cache performnace without any semantics'''
+    '''Return cache performance without any semantics'''
 
     symbolic_kb = KnowledgeBase(path=path_kg)
     D = []
@@ -883,7 +883,7 @@ def run_non_semantic_cache(path_kg:str, path_kge:str, cache_size:int, name_reaso
     }, D
 
 def run_subsumption_cache(path_kg:str, path_kge:str, cache_size:int, name_reasoner:str, eviction:str, random_seed:int, cache_type:str, shuffle_concepts:str):
-    '''Return cache performnace with semantics'''
+    '''Return cache performance with semantics'''
 
     symbolic_kb = KnowledgeBase(path=path_kg)
     D = []
