@@ -93,7 +93,7 @@ The results for other datasets can be obtained similarly by changing the knowled
 The path to all knowledge bases can be found at `Ontolearn/KGs` and `Ontolearn/datasets`, while the learning problems are in `Ontolearn/LPs`.
 For instance, the path to the Vicodi dataset is `Ontolearn/datasets/vicodi/kb` and the corresponding LPs can be found at `Ontolearn/datasets/vicodi/training_data/training_data_prep.json`
 
-Therefore the result for the inconsistent Vicodi dataset with ratio 0.1 using the EBR reasoner can be obtained by running
+Therefore, the result for the inconsistent Vicodi dataset with a ratio of 0.1 using the EBR reasoner can be obtained by running
 
 ```shell
 python examples/concept_learning_evaluation_reasoners.py --reasoner EBR --operation inconsistent --ratio 0.1 --kb "datasets/vicodi/kb" --lps "datasets/vicodi/training_data/training_data_prep.json"
