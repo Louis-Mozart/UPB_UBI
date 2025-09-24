@@ -85,11 +85,11 @@ python examples/concept_learning_evaluation_reasoners.py --reasoner Pellet --ope
 
 This will run the algorithm of the four concept learners CELOE, OCEL, CLIP, and Evolearner with Pellet as the reasoner on the family dataset.
 
-After the `--reaoner` flag we can choose different other reasoners: `["EBR", "Pellet", "HermiT", "JFact", "Openllet", "Structural"]`
+After the `--reaoner` flag, we can choose different other reasoners: `["EBR", "Pellet", "HermiT", "JFact", "Openllet", "Structural"]`
 
 To have the results on the inconsistent or incomplete put after the  ```--operation```  argument `inconsistent` or `incomplete`.
 
-The results for other datatsets can be obtained in a similar manner by changing the knowledge base argument `--kb` and the corresponding learning problems `--lps`.
+The results for other datasets can be obtained in a similar manner by changing the knowledge base argument `--kb` and the corresponding learning problems `--lps`.
 The path to all knowledge bases can be found at `Ontolearn/KGs` and `Ontolearn/datasets` while the learning problems are in `Ontolearn/LPs`.
 For instance the path to the Vicodi dataset is `Ontolearn/datasets/vicodi/kb` and the corresponding LPs can be found at `Ontolearn/datasets/vicodi/training_data/training_data_prep.json`
 
