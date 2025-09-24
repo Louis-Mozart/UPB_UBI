@@ -8,9 +8,9 @@ This experiment demonstrates how to use the **DeCaL** reasoner for class express
 ## Installation
 
 ```shell
-# To create a virtual python env with conda 
+# To create a virtual Python environment with conda 
 conda create -n venv python=3.10.14 --no-default-packages && conda activate venv && pip install -e . && cd Ontolearn
-# To unzip the benchmark datasets knowledge graphs
+# To unzip the benchmark datasets' knowledge graphs
 unzip KGs.zip
 # To unzip the learning problems
 unzip LPs.zip
