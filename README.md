@@ -38,7 +38,7 @@ To evaluate the robustness and flexibility of DeCaL as a backend reasoner when p
 | `--gamma`               | Threshold parameter for the EBR reasoner (default: `0.5`)       |
 | `--p`, `--q`, `--r`     | Parameters for DeCaL                                            |
 
-Other parameters which are internal to DeCaL have been fix to:
+Other parameters which are internal to DeCaL have been fixed to:
 
 `--embedding_dim`: 32 (Embedding dimension to represents nodes and entities)
 
