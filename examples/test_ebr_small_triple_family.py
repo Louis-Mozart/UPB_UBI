@@ -35,15 +35,15 @@ import random
 import itertools
 import ast
 from owlready2 import get_ontology
+from rdflib import Graph, Namespace, URIRef, RDF
+import os
+
 # Set pandas options to ensure full output
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', None)
 pd.set_option('display.colheader_justify', 'left')
 pd.set_option('display.expand_frame_repr', False)
-from rdflib import Graph, Namespace, URIRef, RDF
-import os
-
 
 def remove_percentage_of_type(input_owl_path, output_owl_path, type_name, percentage_to_remove):
     # Load the ontology
