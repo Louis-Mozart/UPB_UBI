@@ -45,6 +45,8 @@ pd.set_option('display.colheader_justify', 'left')
 pd.set_option('display.expand_frame_repr', False)
 
 def remove_percentage_of_type(input_owl_path, output_owl_path, type_name, percentage_to_remove):
+    '''Note, This only works for the family dataset at the moment'''
+    
     # Load the ontology
     g = Graph()
     g.parse(input_owl_path, format='xml')
