@@ -35,9 +35,6 @@ import random
 import itertools
 import ast
 from owlready2 import get_ontology
-
-
-
 # Set pandas options to ensure full output
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
