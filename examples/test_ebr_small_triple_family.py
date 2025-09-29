@@ -14,7 +14,6 @@ from owlapy.class_expression import (
     OWLObjectOneOf,
     OWLObjectComplementOf
 )
-
 from owlapy.owl_property import (
     OWLDataProperty,
     OWLObjectInverseOf,
