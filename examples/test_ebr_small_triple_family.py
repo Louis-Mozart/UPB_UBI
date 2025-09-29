@@ -68,7 +68,6 @@ def remove_percentage_of_type(input_owl_path, output_owl_path, type_name, percen
 
     # Randomly choose the individuals to be removed
     individuals_to_remove = random.sample(individuals_of_type, num_to_remove)
-
     print(f"Removing rdf:type {type_name} from {num_to_remove} out of {len(individuals_of_type)} individuals.")
 
     # Remove those rdf:type triples
