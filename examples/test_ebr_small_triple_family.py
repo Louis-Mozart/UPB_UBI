@@ -77,6 +77,7 @@ def remove_percentage_of_type(input_owl_path, output_owl_path, type_name, percen
     g.serialize(destination=output_owl_path, format='xml')
     print(f"Modified ontology saved to: {output_owl_path}")
 
+    #Return the removed individuals to keep track of them
     return individuals_to_remove
 
 # Example usage:
