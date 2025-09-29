@@ -44,18 +44,18 @@ pd.set_option('display.colheader_justify', 'left')
 pd.set_option('display.expand_frame_repr', False)
 
 def remove_percentage_of_type(input_owl_path, output_owl_path, type_name, percentage_to_remove):
-    '''Note, This only works for the family dataset at the moment'''
+    '''Note, This only works for the family dataset'''
     
-    # Load the ontology
+    # Ontology
     g = Graph()
     g.parse(input_owl_path, format='xml')
 
-    # Define namespaces
+    # Namespaces
     FAMILY = Namespace("http://www.benchmark.org/family#")
     OWL = Namespace("http://www.w3.org/2002/07/owl#")
     target_type = URIRef(FAMILY[type_name])
 
-    # Find all individuals of that type
+    #Find all individuals of the given type
     individuals_of_type = list(g.subjects(RDF.type, target_type))
 
     # Determine how many to remove
@@ -77,7 +77,7 @@ def remove_percentage_of_type(input_owl_path, output_owl_path, type_name, percen
     g.serialize(destination=output_owl_path, format='xml')
     print(f"Modified ontology saved to: {output_owl_path}")
 
-    #Return the removed individuals to keep track of them
+    # Return the removed individuals to keep track of them
     return individuals_to_remove
 
 # Example usage:
