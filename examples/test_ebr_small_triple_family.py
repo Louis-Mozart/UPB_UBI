@@ -77,6 +77,10 @@ def remove_percentage_of_type(input_owl_path, output_owl_path, type_name, percen
     # Serialize the updated graph
     g.serialize(destination=output_owl_path, format='xml')
     print(f"Modified ontology saved to: {output_owl_path}")
+
+    return individu
+
+
     
 
 # Example usage:
