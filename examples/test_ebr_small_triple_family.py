@@ -15,7 +15,6 @@ from owlapy.class_expression import (
     OWLObjectComplementOf
 )
 
-
 from owlapy.owl_property import (
     OWLDataProperty,
     OWLObjectInverseOf,
@@ -23,9 +22,7 @@ from owlapy.owl_property import (
     OWLProperty,
 )
 from owlapy.iri import IRI
-
 from owlapy.owl_individual import OWLNamedIndividual
-
 import time
 from typing import Tuple, Set
 import pandas as pd
@@ -38,16 +35,17 @@ import random
 import itertools
 import ast
 from owlready2 import get_ontology
+
+
+
 # Set pandas options to ensure full output
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', None)
 pd.set_option('display.colheader_justify', 'left')
 pd.set_option('display.expand_frame_repr', False)
-
 from rdflib import Graph, Namespace, URIRef, RDF
 import os
-
 
 
 def remove_percentage_of_type(input_owl_path, output_owl_path, type_name, percentage_to_remove):
