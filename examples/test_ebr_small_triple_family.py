@@ -52,8 +52,6 @@ def remove_percentage_of_type(input_owl_path, output_owl_path, type_name, percen
     # Define namespaces
     FAMILY = Namespace("http://www.benchmark.org/family#")
     OWL = Namespace("http://www.w3.org/2002/07/owl#")
-
-    # Build type URI
     target_type = URIRef(FAMILY[type_name])
 
     # Find all individuals of that type
