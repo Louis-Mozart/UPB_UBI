@@ -62,8 +62,8 @@ def remove_percentage_of_type(input_owl_path, output_owl_path, type_name, percen
     # Determine how many to remove
     num_to_remove = int(len(individuals_of_type) * percentage_to_remove)
     if num_to_remove==0:
-        print(f"percentage of individuals too small, removing only {num_to_remove+1} individual")
-        num
+        print(f"Number of individuals too small, removing only {num_to_remove+1} individual")
+        num_to_remove += 1
     individuals_to_remove = random.sample(individuals_of_type, num_to_remove)
 
     print(f"Removing rdf:type {type_name} from {num_to_remove} out of {len(individuals_of_type)} individuals.")
