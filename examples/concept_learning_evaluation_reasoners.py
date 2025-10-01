@@ -178,7 +178,11 @@ def dl_concept_learning(args):
                 print(f"{algo_name}: Skipped all paths due to invalid LP.")
 
     df = pd.DataFrame.from_dict(data)
-    output_dir = f"Experiments_{args.operation}_cache"
+    if args.use_cache:
+        output_dir = f"Experiments_{args.operation}_cache"
+    else:
+        output_dir = f"Experiments_{args.operation}"
+        
     os.makedirs(output_dir, exist_ok=True)
 
     if args.operation == "normal":
