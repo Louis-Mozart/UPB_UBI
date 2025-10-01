@@ -81,7 +81,8 @@ def dl_concept_learning(args):
     }.items():
         learners_per_algo[algo_name] = dict()
         for path in paths:
-            kb_local = KnowledgeBaseEBR(path=path, which_reasoner=args.reasoner, use_cache=args.use_cache, path_kge=None, gamma=args.gamma)
+
+            kb_local = KnowledgeBaseEBR(path=path, which_reasoner=args.reasoner, use_cache=args.use_cache, path_kge=None, gamma=args.gamma, model=args.model, p=args.p, q=args.q, r=args.r)
 
             if algo_name == "Evo":
                 continue  
@@ -136,32 +137,32 @@ def dl_concept_learning(args):
             f1s, runtimes = [], []
 
             for path in paths:
-                try:
-                    if algo_name == "Evo":
-                        kb_local = KnowledgeBaseEBR(path=path, which_reasoner=args.reasoner, use_cache=args.use_cache, path_kge=None, gamma=args.gamma)
-                        learner = learner_cls(
-                            knowledge_base=kb_local,
-                            quality_func=F1(),
-                            max_runtime=args.max_runtime
-                        )
-                    else:
-                        learner = learners_per_algo[algo_name][path]
-
-                    start_time = time.time()
-                    pred = learner.fit(lp).best_hypotheses(n=1)
-                    runtime = time.time() - start_time
-
-                    f1 = compute_f1_score(
-                        individuals=frozenset({i for i in kb_origin.individuals(pred)}),
-                        pos=lp.pos, neg=lp.neg
+                # try:
+                if algo_name == "Evo":
+                    kb_local = KnowledgeBaseEBR(path=path, which_reasoner=args.reasoner, use_cache=args.use_cache, path_kge=None, gamma=args.gamma, model=args.model, p=args.p, q=args.q, r=args.r)
+                    learner = learner_cls(
+                        knowledge_base=kb_local,
+                        quality_func=F1(),
+                        max_runtime=args.max_runtime
                     )
-                    f1s.append(f1)
-                    runtimes.append(runtime)
+                else:
+                    learner = learners_per_algo[algo_name][path]
 
-                except AssertionError as e:
-                    print(f"⚠️ Skipping learning problem due to invalid pos/neg examples: {e}")
-                except Exception as e:
-                    print(f"❌ Unexpected error during learner run: {e}")
+                start_time = time.time()
+                pred = learner.fit(lp).best_hypotheses(n=1)
+                runtime = time.time() - start_time
+
+                f1 = compute_f1_score(
+                    individuals=frozenset({i for i in kb_origin.individuals(pred)}),
+                    pos=lp.pos, neg=lp.neg
+                )
+                f1s.append(f1)
+                runtimes.append(runtime)
+
+                # except AssertionError as e:
+                #     print(f"⚠️ Skipping learning problem due to invalid pos/neg examples: {e}")
+                # except Exception as e:
+                #     print(f"❌ Unexpected error during learner run: {e}")
 
             if f1s:
                 data.setdefault(f"F1-{algo_name}-mean", []).append(np.mean(f1s))
@@ -196,7 +197,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Description Logic Concept Learning')
     parser.add_argument("--max_runtime", type=int, default=60)
     parser.add_argument("--lps", type=str, default="LPs/Family/lps.json")#, required=True)
-    parser.add_argument("--lps_difficult", type=str, default="datasets/family/training_data/training_data_prep.json")#, required=True)
+    parser.add_argument("--lps_difficult", type=str, default=None)#, required=True)
     parser.add_argument("--kb", type=str, default="KGs/Family/family-benchmark_rich_background.owl")#,required=True)
     parser.add_argument("--path_pretrained_kge", type=str, default=None)
     parser.add_argument("--data_name", type=str, default="family")
@@ -205,4 +206,9 @@ if __name__ == '__main__':
     parser.add_argument("--use_cache", type=bool, default=False, help="Use the semantic cache for the reasoners")
     parser.add_argument("--ratio", type=float, default=0.1, help="level of incompleteness, inconsistencies")
     parser.add_argument("--gamma", type=float, default=0.5, help="Threshold for EBR")
+    parser.add_argument("--model", type=str, default="DeCaL", help="name of the KGE model if reasoner is EBR")
+    parser.add_argument("--p", type=int, default=1, help="Clifford space parameter in case model is Keci or DeCaL")
+    parser.add_argument("--q", type=int, default=1, help="Clifford space parameter in case model is Keci or DeCaL")
+    parser.add_argument("--r", type=int, default=1, help="Clifford space parameter in case model is Keci or DeCaL")
+
     dl_concept_learning(parser.parse_args())

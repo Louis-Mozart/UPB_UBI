@@ -106,6 +106,10 @@ class KnowledgeBaseEBR(AbstractKnowledgeBase):
                  which_reasoner: str,
                  path_kge: str=None, 
                  gamma:float=None,
+                 model:str=None,
+                 p:int=None,
+                 q:int=None,
+                 r:int=None,
                  use_cache: bool = False):
                  
         AbstractKnowledgeBase.__init__(self)
@@ -118,6 +122,8 @@ class KnowledgeBaseEBR(AbstractKnowledgeBase):
        
         self.use_cache = use_cache
         self.gamma = gamma
+        self.model = model
+        self.p, self.q, self.r = p,q,r
 
         self.path = path
         self.path_kge = path_kge
@@ -192,8 +198,8 @@ class KnowledgeBaseEBR(AbstractKnowledgeBase):
             return frozenset(self.ontology.individuals_in_signature())
 
         if self.which_reasoner == "EBR":
-            ebr_reasoner = TripleStoreNeuralReasoner(path_neural_embedding=self.path_kge, gamma=self.gamma) \
-                if self.path_kge else TripleStoreNeuralReasoner(path_of_kb=self.path, gamma=self.gamma)
+            ebr_reasoner = TripleStoreNeuralReasoner(path_neural_embedding=self.path_kge, gamma=self.gamma, model=self.model, p=self.p, q=self.q, r=self.r) \
+                if self.path_kge else TripleStoreNeuralReasoner(path_of_kb=self.path, gamma=self.gamma, model=self.model, p=self.p, q=self.q, r=self.r)
             
             return frozenset(ebr_reasoner.individuals(concept))
 
