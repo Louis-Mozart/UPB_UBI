@@ -137,32 +137,32 @@ def dl_concept_learning(args):
             f1s, runtimes = [], []
 
             for path in paths:
-                # try:
-                if algo_name == "Evo":
-                    kb_local = KnowledgeBaseEBR(path=path, which_reasoner=args.reasoner, use_cache=args.use_cache, path_kge=None, gamma=args.gamma, model=args.model, p=args.p, q=args.q, r=args.r)
-                    learner = learner_cls(
-                        knowledge_base=kb_local,
-                        quality_func=F1(),
-                        max_runtime=args.max_runtime
+                try:
+                    if algo_name == "Evo":
+                        kb_local = KnowledgeBaseEBR(path=path, which_reasoner=args.reasoner, use_cache=args.use_cache, path_kge=None, gamma=args.gamma, model=args.model, p=args.p, q=args.q, r=args.r)
+                        learner = learner_cls(
+                            knowledge_base=kb_local,
+                            quality_func=F1(),
+                            max_runtime=args.max_runtime
+                        )
+                    else:
+                        learner = learners_per_algo[algo_name][path]
+
+                    start_time = time.time()
+                    pred = learner.fit(lp).best_hypotheses(n=1)
+                    runtime = time.time() - start_time
+
+                    f1 = compute_f1_score(
+                        individuals=frozenset({i for i in kb_origin.individuals(pred)}),
+                        pos=lp.pos, neg=lp.neg
                     )
-                else:
-                    learner = learners_per_algo[algo_name][path]
+                    f1s.append(f1)
+                    runtimes.append(runtime)
 
-                start_time = time.time()
-                pred = learner.fit(lp).best_hypotheses(n=1)
-                runtime = time.time() - start_time
-
-                f1 = compute_f1_score(
-                    individuals=frozenset({i for i in kb_origin.individuals(pred)}),
-                    pos=lp.pos, neg=lp.neg
-                )
-                f1s.append(f1)
-                runtimes.append(runtime)
-
-                # except AssertionError as e:
-                #     print(f"⚠️ Skipping learning problem due to invalid pos/neg examples: {e}")
-                # except Exception as e:
-                #     print(f"❌ Unexpected error during learner run: {e}")
+                except AssertionError as e:
+                    print(f"⚠️ Skipping learning problem due to invalid pos/neg examples: {e}")
+                except Exception as e:
+                    print(f"❌ Unexpected error during learner run: {e}")
 
             if f1s:
                 data.setdefault(f"F1-{algo_name}-mean", []).append(np.mean(f1s))
