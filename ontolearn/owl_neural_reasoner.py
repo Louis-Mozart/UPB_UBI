@@ -69,7 +69,7 @@ class TripleStoreNeuralReasoner:
             self.model = KGE(path=path_neural_embedding)
         elif path_of_kb:
             assert os.path.isfile(path_of_kb), f"The given path ({path_of_kb}) does not lead to an RDF Knowledge Graph."
-            # Check if we have already a trained model for a given path of a knowledge base 
+            # Check if we already have a trained model for a given path of a knowledge base 
             dir_of_potential_neural_embedding_model = f"{path_of_kb}_{self.p}_{self.q}_{self.r}".replace("/", "_").replace(".", "_")
 
             if os.path.isdir(dir_of_potential_neural_embedding_model):
