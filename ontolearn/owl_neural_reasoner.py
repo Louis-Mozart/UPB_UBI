@@ -43,9 +43,11 @@ def is_valid_entity(text_input: str):
 
 class TripleStoreNeuralReasoner:
     """ OWL Neural Reasoner uses a neural link predictor to retrieve instances of an OWL Class Expression"""
-    def __init__(self, path_of_kb: str = None, path_neural_embedding: str = None, gamma: float = 0.25, max_cache_size: int = 2**20):
+    def __init__(self, path_of_kb: str = None, path_neural_embedding: str = None, gamma: float = 0.25, max_cache_size: int = 2**20, model:str="Keci",p:int=0, q:int=0,r:int=0):
         assert gamma is None or 0 <= gamma <= 1, "Confidence threshold (gamma) must be in the range [0, 1]."
         self.gamma = gamma
+        self.model = model
+        self.p,self.q,self.r = p,q,r
         self._prediction_cache = OrderedDict()
         self._max_cache_size = max_cache_size
         self.str_iri_subclassof="http://www.w3.org/2000/01/rdf-schema#subClassOf"
@@ -57,6 +59,7 @@ class TripleStoreNeuralReasoner:
         self.str_iri_boolean = "http://www.w3.org/2001/XMLSchema#boolean"
         self.str_iri_data_property="http://www.w3.org/2002/07/owl#DatatypeProperty"
 
+
         if isinstance(max_cache_size,int) and max_cache_size>0:
            self.predict=lru_cache(maxsize=max_cache_size)(self.predict)
 
@@ -66,27 +69,33 @@ class TripleStoreNeuralReasoner:
             self.model = KGE(path=path_neural_embedding)
         elif path_of_kb:
             assert os.path.isfile(path_of_kb), f"The given path ({path_of_kb}) does not lead to an RDF Knowledge Graph."
-            # Check we have already a trained model for a given path of a knowledge base
-            dir_of_potential_neural_embedding_model = path_of_kb.replace("/", "_").replace(".", "_")
+            # Check if we already have a trained model for a given path of a knowledge base 
+            dir_of_potential_neural_embedding_model = f"{path_of_kb}_{self.p}_{self.q}_{self.r}".replace("/", "_").replace(".", "_")
+
             if os.path.isdir(dir_of_potential_neural_embedding_model):
                 self.model = KGE(path=dir_of_potential_neural_embedding_model)
             else:  # pragma: no cover
                 # Train a KGE on the fly
                 from dicee.executer import Execute
                 from dicee.config import Namespace
+                print(f"Running model {model} with params {p, q, r}")
                 args = Namespace()
-                args.model = 'Keci'
+                args.model = self.model
                 args.scoring_technique = "AllvsAll"
                 args.path_single_kg = path_of_kb
                 path_of_kb = path_of_kb.replace("/", "_")
                 path_of_kb = path_of_kb.replace(".", "_")
+                path_of_kb = f"{path_of_kb}_{self.p}_{self.q}_{self.r}"
                 args.path_to_store_single_run = path_of_kb
                 args.num_epochs = 100
                 args.embedding_dim = 32
                 args.batch_size = 1024
                 args.backend = "rdflib"
                 args.trainer = "PL"
-                # args.save_embeddings_as_csv = "True"
+                args.p = self.p
+                args.q = self.q
+                args.r = self.r
+                args.save_embeddings_as_csv = "True"
                 reports = Execute(args).start()
                 path_neural_embedding = reports["path_experiment_folder"]
                 self.model = KGE(path=path_neural_embedding)
@@ -138,8 +147,9 @@ class TripleStoreNeuralReasoner:
         else:
             topk = len(self.model.entity_to_idx)
 
-
-        return [ (top_entity, score)  for top_entity, score in self.model.predict_topk(h=h, r=r, t=t, topk=topk) if score >= self.gamma and is_valid_entity(top_entity)]
+        # print(self.model.predict_topk(h=h, r=r, t=t, topk=10))
+        # exit(0)
+        return [ (top_entity, score)  for top_entity, score in self.model.predict_topk(h=h, r=r, t=t, topk=topk)[0] if score >= self.gamma and is_valid_entity(top_entity)]
 
     def predict_individuals_of_owl_class(self, owl_class: OWLClass) -> List[OWLNamedIndividual]:
         top_entities=set()

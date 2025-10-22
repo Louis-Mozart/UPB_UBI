@@ -100,19 +100,19 @@ def concept_generator(path_kg):
     unions_unnc = concept_reducer(unnc, opt=OWLObjectUnionOf)
     # (14) UNNC INTERACTION UNNC.
     intersections_unnc = concept_reducer(unnc, opt=OWLObjectIntersectionOf)
-    # (15) \exist r. C s.t. C \in UNNC and r \in R* .
+    # (15) \exist r. C s.t. C \in UNNC and r \in R*.
     exist_unnc = concept_reducer_properties(
         concepts=unnc,
         properties=object_properties,#object_properties_and_inverse,
         cls=OWLObjectSomeValuesFrom,
     )
-    # (16) \forall r. C s.t. C \in UNNC and r \in R* .
+    # (16) \forall r. C s.t. C \in UNNC and r \in R*.
     for_all_unnc = concept_reducer_properties(
         concepts=unnc,
         properties=object_properties,#object_properties_and_inverse,
         cls=OWLObjectAllValuesFrom,
     )
-    # (17) >= n r. C  and =< n r. C, s.t. C \in UNNC and r \in R* .
+    # (17) >= n r. C  and =< n r. C, s.t. C \in UNNC and r \in R*.
     min_cardinality_unnc_1, min_cardinality_unnc_2, min_cardinality_unnc_3 = (
         concept_reducer_properties(
             concepts=unnc,
@@ -131,7 +131,7 @@ def concept_generator(path_kg):
         )
         for i in [1, 2, 3]
     )
-    # (18) \exist r. Nominal s.t. Nominal \in Nominals and r \in R* .
+    # (18) \exist r. Nominal s.t. Nominal \in Nominals and r \in R*.
     exist_nominals = concept_reducer_properties(
         concepts=nominal_combinations,
         properties=object_properties_and_inverse,
@@ -140,7 +140,7 @@ def concept_generator(path_kg):
 
     ###################################################################
 
-    # () Converted to list so that the progress bar works.
+    # () Converted to a list so that the progress bar works.
     random.seed(0)
     if len(intersections_unnc) > 500:
         intersections_unnc = random.sample(intersections_unnc, k=500)
@@ -167,7 +167,7 @@ def get_saved_concepts(path_kg, data_name, shuffle):
     cache_dir = f"caching_results_{data_name}"
     os.makedirs(cache_dir, exist_ok=True)
 
-    # Determine the filename based on shuffle flag
+    # Determine the filename based on the shuffle flag
     filename = "shuffled_concepts.pkl" if shuffle else "unshuffled_concepts.pkl"
     save_file = os.path.join(cache_dir, filename)
 
@@ -205,7 +205,7 @@ class CacheWithEviction:
         self.initialized = False  # Track if cache is already initialized
 
     def _evict(self):
-        '''empty the cache when it is full using different strategy'''
+        '''empty the cache when it is full using a different strategy'''
         if len(self.cache) > self.cache_size:
             if self.strategy == 'FIFO':
                 self.cache.popitem(last=False)  # Evict the oldest item (first in)
@@ -389,7 +389,7 @@ def semantic_caching_size(func, cache_size, eviction_strategy, random_seed, cach
             result = cached_result if cached_result is not None else func(*args)
 
         elif isinstance(owl_expression, OWLObjectComplementOf):
-            if cache_type == 'cold': #If it is cold then all complement object are already cached at initialisation time
+            if cache_type == 'cold': #If it is cold, then all complement objects are already cached at initialisation time
                 cached_result_cold = retrieve_from_cache(str_expression)
                 result =  cached_result_cold if cached_result_cold is not None else func(*args)
             else: 
@@ -726,7 +726,7 @@ def retrieve_other_reasoner(expression, path_kg, name_reasoner='HermiT'):
 
 
 def run_semantic_cache(path_kg:str, path_kge:str, cache_size:int, name_reasoner:str, eviction:str, random_seed:int, cache_type:str, shuffle_concepts:str):
-    '''Return cache performnace with semantics'''
+    '''Return cache performance with semantics'''
 
     symbolic_kb = KnowledgeBase(path=path_kg)
     D = []
@@ -806,7 +806,7 @@ def run_semantic_cache(path_kg:str, path_kge:str, cache_size:int, name_reasoner:
 
 
 def run_non_semantic_cache(path_kg:str, path_kge:str, cache_size:int, name_reasoner:str, shuffle_concepts:str):
-    '''Return cache performnace without any semantics'''
+    '''Return cache performance without any semantics'''
 
     symbolic_kb = KnowledgeBase(path=path_kg)
     D = []
@@ -883,7 +883,7 @@ def run_non_semantic_cache(path_kg:str, path_kge:str, cache_size:int, name_reaso
     }, D
 
 def run_subsumption_cache(path_kg:str, path_kge:str, cache_size:int, name_reasoner:str, eviction:str, random_seed:int, cache_type:str, shuffle_concepts:str):
-    '''Return cache performnace with semantics'''
+    '''Return cache performance with semantics'''
 
     symbolic_kb = KnowledgeBase(path=path_kg)
     D = []

@@ -81,7 +81,8 @@ def dl_concept_learning(args):
     }.items():
         learners_per_algo[algo_name] = dict()
         for path in paths:
-            kb_local = KnowledgeBaseEBR(path=path, which_reasoner=args.reasoner, use_cache=args.use_cache, path_kge=None, gamma=args.gamma)
+
+            kb_local = KnowledgeBaseEBR(path=path, which_reasoner=args.reasoner, use_cache=args.use_cache, path_kge=None, gamma=args.gamma, model=args.model, p=args.p, q=args.q, r=args.r)
 
             if algo_name == "Evo":
                 continue  
@@ -138,7 +139,7 @@ def dl_concept_learning(args):
             for path in paths:
                 try:
                     if algo_name == "Evo":
-                        kb_local = KnowledgeBaseEBR(path=path, which_reasoner=args.reasoner, use_cache=args.use_cache, path_kge=None, gamma=args.gamma)
+                        kb_local = KnowledgeBaseEBR(path=path, which_reasoner=args.reasoner, use_cache=args.use_cache, path_kge=None, gamma=args.gamma, model=args.model, p=args.p, q=args.q, r=args.r)
                         learner = learner_cls(
                             knowledge_base=kb_local,
                             quality_func=F1(),
@@ -177,7 +178,11 @@ def dl_concept_learning(args):
                 print(f"{algo_name}: Skipped all paths due to invalid LP.")
 
     df = pd.DataFrame.from_dict(data)
-    output_dir = f"Experiments_{args.operation}_cache"
+    if args.use_cache:
+        output_dir = f"Experiments_{args.operation}_cache"
+    else:
+        output_dir = f"Experiments_{args.operation}"
+        
     os.makedirs(output_dir, exist_ok=True)
 
     if args.operation == "normal":
@@ -196,7 +201,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Description Logic Concept Learning')
     parser.add_argument("--max_runtime", type=int, default=60)
     parser.add_argument("--lps", type=str, default="LPs/Family/lps.json")#, required=True)
-    parser.add_argument("--lps_difficult", type=str, default="datasets/family/training_data/training_data_prep.json")#, required=True)
+    parser.add_argument("--lps_difficult", type=str, default=None)#, required=True)
     parser.add_argument("--kb", type=str, default="KGs/Family/family-benchmark_rich_background.owl")#,required=True)
     parser.add_argument("--path_pretrained_kge", type=str, default=None)
     parser.add_argument("--data_name", type=str, default="family")
@@ -205,4 +210,9 @@ if __name__ == '__main__':
     parser.add_argument("--use_cache", type=bool, default=False, help="Use the semantic cache for the reasoners")
     parser.add_argument("--ratio", type=float, default=0.1, help="level of incompleteness, inconsistencies")
     parser.add_argument("--gamma", type=float, default=0.5, help="Threshold for EBR")
+    parser.add_argument("--model", type=str, default="DeCaL", help="name of the KGE model if reasoner is EBR")
+    parser.add_argument("--p", type=int, default=1, help="Clifford space parameter in case model is Keci or DeCaL")
+    parser.add_argument("--q", type=int, default=1, help="Clifford space parameter in case model is Keci or DeCaL")
+    parser.add_argument("--r", type=int, default=1, help="Clifford space parameter in case model is Keci or DeCaL")
+
     dl_concept_learning(parser.parse_args())

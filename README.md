@@ -1,16 +1,16 @@
 
 ## DeCaL Reasoner Evaluation for Class Expression Learning
 
-This experiment demonstrates how to use the **DeCaL** reasoner for class expression learning in Description Logics. The key idea is to show that **DeCaL** can work with **any concept learning algorithm**, and can adapt to different configurations controlled by parameters `p`, `q`, and `r`.
+This experiment demonstrates how to use the **EBR** reasoner for class expression learning in Description Logics. The key idea is to show that **EBR** can work with **any concept learning algorithm**, and can adapt to different configurations controlled by parameters `p`, `q`, and `r` of the **DeCaL** model used as embedding model.
 
 
 
 ## Installation
 
 ```shell
-# To create a virtual python env with conda 
+# To create a virtual Python environment with conda 
 conda create -n venv python=3.10.14 --no-default-packages && conda activate venv && pip install -e . && cd Ontolearn
-# To unzip the benchmark datasets knowledge graphs
+# To unzip the benchmark datasets' knowledge graphs
 unzip KGs.zip
 # To unzip the learning problems
 unzip LPs.zip
@@ -21,7 +21,7 @@ Other datasets and learning problems can be manually downloaded from [here](http
 
 ## Goal 
 
-To evaluate the robustness and flexibility of DeCaL as a backend reasoner when plugged into any concept learning system — here using a learning pipeline applied to the Family dataset.
+To evaluate the robustness and flexibility of DeCaL as a backend reasoner when plugged into any concept learning system, here we use a learning pipeline applied to the Family dataset.
 
 
 | Argument                | Description                                                     |
@@ -38,11 +38,11 @@ To evaluate the robustness and flexibility of DeCaL as a backend reasoner when p
 | `--gamma`               | Threshold parameter for the EBR reasoner (default: `0.5`)       |
 | `--p`, `--q`, `--r`     | Parameters for DeCaL                                            |
 
-Other parameters which are ineternal to DeCaL have been fix to:
+Other parameters which are internal to DeCaL have been fixed to:
 
-`--embedding_dim`: 32 (Embedding dimension to represents nodes and entities)
+`--embedding_dim`: 32 (Embedding dimension to represent nodes and entities)
 
-`--num_epochs`: 100 Number of Epoch to train DeCaL
+`--num_epochs`: 100 Number of Epochs to train DeCaL
 
 `--learning_rate`: 0.1
 
@@ -77,23 +77,23 @@ This script runs the learning system 8 times, each with a different configuratio
 
 ## Concept learning with EBR
 
-To get the results on concept learning on error free Family dataset, run
+To get the results on concept learning on the error-free Family dataset, run
 
 ```shell
 python examples/concept_learning_evaluation_reasoners.py --reasoner Pellet --operation normal --kb "KGs/Family/family-benchmark_rich_background.owl" --lps "LPs/Family/lps.json"
 ```
 
-This will run the algorithm of the four comcept learners CELOE, OCEL, CLIP and Evolearner with Pellet as the reasoner on the family dataset.
+This will run the algorithm of the four concept learners CELOE, OCEL, CLIP, and Evolearner with Pellet as the reasoner on the family dataset.
 
-After the `--reaoner` flag we can choose different other reasoners: `["EBR", "Pellet", "HermiT", "JFact", "Openllet", "Structural"]`
+After the `--reaoner` flag, we can choose different other reasoners: `["EBR", "Pellet", "HermiT", "JFact", "Openllet", "Structural"]`
 
 To have the results on the inconsistent or incomplete put after the  ```--operation```  argument `inconsistent` or `incomplete`.
 
-The results for other datatsets can be obtained in a similar manner by changing the knowledge base argument `--kb` and the corresponding learning problems `--lps`.
-The path to all knowledge bases can be found at `Ontolearn/KGs` and `Ontolearn/datasets` while the learning problems are in `Ontolearn/LPs`.
-For instance the path to the Vicodi dataset is `Ontolearn/datasets/vicodi/kb` and the corresponding LPs can be found at `Ontolearn/datasets/vicodi/training_data/training_data_prep.json`
+The results for other datasets can be obtained similarly by changing the knowledge base argument `--kb` and the corresponding learning problems `--lps`.
+The path to all knowledge bases can be found at `Ontolearn/KGs` and `Ontolearn/datasets`, while the learning problems are in `Ontolearn/LPs`.
+For instance, the path to the Vicodi dataset is `Ontolearn/datasets/vicodi/kb` and the corresponding LPs can be found at `Ontolearn/datasets/vicodi/training_data/training_data_prep.json`
 
-Therefore the result for the inconsistent Vicodi dataset with ratio 0.1 using the EBR reasoner can be obtained by running
+Therefore, the result for the inconsistent Vicodi dataset with a ratio of 0.1 using the EBR reasoner can be obtained by running
 
 ```shell
 python examples/concept_learning_evaluation_reasoners.py --reasoner EBR --operation inconsistent --ratio 0.1 --kb "datasets/vicodi/kb" --lps "datasets/vicodi/training_data/training_data_prep.json"
@@ -101,7 +101,7 @@ python examples/concept_learning_evaluation_reasoners.py --reasoner EBR --operat
 
 ## Effect of the threshold
 
-To see the effect of the threhold gamma, run the same codes by adding the argument `--gamma 0.9` which means we are setting a threshold of 0.9. The default threshold is set to 0.5
+To see the effect of the threshold gamma, run the same code by adding the argument `--gamma 0.9`, which means we are setting a threshold of 0.9. The default threshold is set to 0.5
 
 
 ## Example of the concept learning results on the Family dataset
