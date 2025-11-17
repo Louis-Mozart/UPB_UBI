@@ -80,13 +80,13 @@ def remove_percentage_of_type(input_owl_path, output_owl_path, type_name, percen
     # Return the removed individuals to keep track of them
     return individuals_to_remove
 
-# Example usage:
-removed_instances=remove_percentage_of_type(
-    input_owl_path="KGs/Family/family.owl",
-    output_owl_path="KGs/Family/family_modified.owl",
-    type_name="Grandmother", # Or Class
-    percentage_to_remove=0.3 # 30%
-)
+# # Example usage:
+# removed_instances=remove_percentage_of_type(
+#     input_owl_path="KGs/Family/family.owl",
+#     output_owl_path="KGs/Family/family_modified.owl",
+#     type_name="Grandmother", # Or Class
+#     percentage_to_remove=0.3 # 30%
+# )
 
 
 
