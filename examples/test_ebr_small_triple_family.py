@@ -2,7 +2,7 @@
 from ontolearn.owl_neural_reasoner import TripleStoreNeuralReasoner
 from ontolearn.knowledge_base import KnowledgeBase
 from ontolearn.triple_store import TripleStore
-from ontolearn.utils import jaccard_similarity, f1_set_similarity, concept_reducer, 
+from ontolearn.utils import jaccard_similarity, f1_set_similarity
 from owlapy.class_expression import (
     OWLClass,
     OWLObjectUnionOf,
