@@ -155,7 +155,7 @@ def dl_concept_learning(args):
 
             print("Evo starts..", end="\t")
             start_time = time.time()
-            # BUG: Evolearner needs to be initalized for each learning problem
+            # BUG: Evolearner needs to be initialized for each learning problem
             evolearner = EvoLearner(knowledge_base=KnowledgeBaseEBR(path=args.kb, which_reasoner="Pellet"),
                                     quality_func=F1(),
                                     max_runtime=args.max_runtime)
