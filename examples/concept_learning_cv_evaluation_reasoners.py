@@ -166,7 +166,7 @@ def dl_concept_learning(args):
             train_f1_evo = compute_f1_score(individuals=frozenset({i for i in kb.individuals(pred_evo)}),
                                             pos=train_lp.pos,
                                             neg=train_lp.neg)
-            # () Quality on test data
+            # () Quality on the test data
             test_f1_evo = compute_f1_score(individuals=frozenset({i for i in kb.individuals(pred_evo)}),
                                            pos=test_lp.pos,
                                            neg=test_lp.neg)
