@@ -115,7 +115,7 @@ def dl_concept_learning(args):
             pred_ocel = ocel.fit(train_lp).best_hypotheses()
             rt_ocel = time.time() - start_time
             print("OCEL ends..", end="\t")
-            # () Quality on the training data
+            # () Quality of the training data
             train_f1_ocel = compute_f1_score(individuals=frozenset({i for i in kb.individuals(pred_ocel)}),
                                              pos=train_lp.pos,
                                              neg=train_lp.neg)
