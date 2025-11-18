@@ -162,7 +162,7 @@ def dl_concept_learning(args):
             pred_evo = evolearner.fit(train_lp).best_hypotheses()
             rt_evo = time.time() - start_time
             print("Evo ends..", end="\t")
-            # () Quality on the training data
+            # () Quality of the training data
             train_f1_evo = compute_f1_score(individuals=frozenset({i for i in kb.individuals(pred_evo)}),
                                             pos=train_lp.pos,
                                             neg=train_lp.neg)
