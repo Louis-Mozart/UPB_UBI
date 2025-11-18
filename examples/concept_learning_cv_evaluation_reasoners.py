@@ -88,7 +88,7 @@ def dl_concept_learning(args):
             #
             data.setdefault("LP", []).append(str_target_concept)
             data.setdefault("Fold", []).append(ith)
-            # () Extract positive and negative examples from train fold
+            # () Extract positive and negative examples from the train fold
             train_pos = {pos_individual for pos_individual in X[train_index][y[train_index] == 1]}
             train_neg = {neg_individual for neg_individual in X[train_index][y[train_index] == 0]}
 
