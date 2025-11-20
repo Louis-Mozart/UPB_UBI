@@ -1,7 +1,7 @@
 
 ## DeCaL Reasoner Evaluation for Class Expression Learning
 
-This experiment demonstrates how to use the **EBR** reasoner for class expression learning in Description Logics. The key idea is to show that **EBR** can work with **any concept learning algorithm**, and can adapt to different configurations controlled by parameters `p`, `q`, and `r` of the **DeCaL** model used as embedding model.
+This experiment demonstrates how to use the **EBR** reasoner for class expression learning in Description Logics. The key idea is to show that **EBR** can work with **any concept learning algorithm**, and can adapt to different configurations controlled by parameters `p`, `q`, and `r` of the **DeCaL** model used as an embedding model.
 
 
 

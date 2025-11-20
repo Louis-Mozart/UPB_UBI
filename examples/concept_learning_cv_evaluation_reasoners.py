@@ -1,4 +1,4 @@
-""" StratifiedKFold Cross Validating DL Concept Learning Algorithms
+""" StratifiedKFold Cross-Validating DL Concept Learning Algorithms
 python examples/concept_learning_cv_evaluation.py --lps LPs/Family/lps_difficult.json --kb KGs/Family/family.owl --max_runtime 60 --report family.csv --path_of_nces_embeddings ./NCESData/family/embeddings/DeCaL_entity_embeddings.csv --path_of_nces_trained_models ./NCESData/family/trained_models/ --path_of_nces2_trained_models ./NCES2Data/family/trained_models/ --path_of_roces_trained_models ./ROCESData/family/trained_models/ --path_of_clip_embeddings ./CLIPData/family/embeddings/ConEx_entity_embeddings.csv
 
 python examples/concept_learning_cv_evaluation.py --lps LPs/Carcinogenesis/lps.json --kb KGs/Carcinogenesis/carcinogenesis.owl --max_runtime 60 --report carcinogenesis.csv --path_of_nces_embeddings ./NCESData/carcinogenesis/embeddings/DeCaL_entity_embeddings.csv --path_of_nces_trained_models ./NCESData/carcinogenesis/trained_models/ --path_of_nces2_trained_models ./NCES2Data/carcinogenesis/trained_models/ --path_of_roces_trained_models ./ROCESData/carcinogenesis/trained_models/ --path_of_clip_embeddings ./CLIPData/carcinogenesis/embeddings/ConEx_entity_embeddings.csv
@@ -88,7 +88,7 @@ def dl_concept_learning(args):
             #
             data.setdefault("LP", []).append(str_target_concept)
             data.setdefault("Fold", []).append(ith)
-            # () Extract positive and negative examples from train fold
+            # () Extract positive and negative examples from the train fold
             train_pos = {pos_individual for pos_individual in X[train_index][y[train_index] == 1]}
             train_neg = {neg_individual for neg_individual in X[train_index][y[train_index] == 0]}
 
@@ -115,7 +115,7 @@ def dl_concept_learning(args):
             pred_ocel = ocel.fit(train_lp).best_hypotheses()
             rt_ocel = time.time() - start_time
             print("OCEL ends..", end="\t")
-            # () Quality on the training data
+            # () Quality of the training data
             train_f1_ocel = compute_f1_score(individuals=frozenset({i for i in kb.individuals(pred_ocel)}),
                                              pos=train_lp.pos,
                                              neg=train_lp.neg)
@@ -155,18 +155,18 @@ def dl_concept_learning(args):
 
             print("Evo starts..", end="\t")
             start_time = time.time()
-            # BUG: Evolearner needs to be initalized for each learning problem
+            # BUG: Evolearner needs to be initialized for each learning problem
             evolearner = EvoLearner(knowledge_base=KnowledgeBaseEBR(path=args.kb, which_reasoner="Pellet"),
                                     quality_func=F1(),
                                     max_runtime=args.max_runtime)
             pred_evo = evolearner.fit(train_lp).best_hypotheses()
             rt_evo = time.time() - start_time
             print("Evo ends..", end="\t")
-            # () Quality on the training data
+            # () Quality of the training data
             train_f1_evo = compute_f1_score(individuals=frozenset({i for i in kb.individuals(pred_evo)}),
                                             pos=train_lp.pos,
                                             neg=train_lp.neg)
-            # () Quality on test data
+            # () Quality on the test data
             test_f1_evo = compute_f1_score(individuals=frozenset({i for i in kb.individuals(pred_evo)}),
                                            pos=test_lp.pos,
                                            neg=test_lp.neg)
