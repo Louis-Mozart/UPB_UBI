@@ -229,6 +229,18 @@ if __name__ == "__main__":
     q_s = range(10)
     r_s = range(10)
 
+    pqr_list = []
+    i = 0
+    for p in p_s:
+        for q in q_s:
+            for r in r_s:
+                value = 1 + p + q + r
+                if value != 0 and 32 % value == 0:
+                    print(f"p={p}, q={q}, r={r} → 1+p+q+r={value} divides 32")
+                    print(i)
+                    i += 1
+                    pqr_list.append(f"{p}_{q}_{r}")
+
     # Prepare a dictionary to store results
     results_dict = defaultdict(list)
     for run in range(5):
@@ -251,91 +263,93 @@ if __name__ == "__main__":
                     # Train models on the ontology with the partially removed class
                     path_diminished = f"KGs/{dataset}/{experiment}/{dataset.lower()}_{removal}_modified_{class_name.lower()}.owl"
 
-                    for p in p_s:
-                        for q in q_s:
-                            for r in r_s:
+                    for pqr in pqr_list:
+                        p = pqr.split("_")[0]
+                        q = pqr.split("_")[1]
+                        r = pqr.split("_")[2]
 
-                                # Initialize model for this triple (p, q, r)
-                                neural_owl_reasoner = TripleStoreNeuralReasoner(
-                                    path_of_kb=path_diminished,
-                                    gamma=0.5,
-                                    model='DeCaL',
-                                    p=p, q=q, r=r
-                                )
+                        # Initialize model for this triple (p, q, r)
+                        neural_owl_reasoner = TripleStoreNeuralReasoner(
+                            path_of_kb=path_diminished,
+                            gamma=0.5,
+                            model='DeCaL',
+                            p=p, q=q, r=r
+                        )
 
-                                pqr = f"{p}_{q}_{r}"
-                                kge_path = f"./KGs_{dataset}_{experiment}_{dataset.lower()}_{removal}_modified_{class_name.lower()}_owl_{pqr}"
+                        pqr = f"{p}_{q}_{r}"
+                        kge_path = f"./KGs_{dataset}_{experiment}_{dataset.lower()}_{removal}_modified_{class_name.lower()}_owl_{pqr}"
 
-                                # Load model
-                                pqr_model, (_, _) = load_model(path_of_experiment_folder=kge_path)
+                        # Load model
+                        pqr_model, (_, _) = load_model(path_of_experiment_folder=kge_path)
 
-                                # Get the embeddings of the model
-                                _, _, ind_embeddings, inds = process_family_df(get_entity_df(kge_path, pqr))
+                        # Get the embeddings of the model
+                        _, _, ind_embeddings, inds = process_family_df(get_entity_df(kge_path, pqr))
 
-                                # Get the class embeddings from the model
-                                class_embeddings, classes = get_class_embeddings(get_entity_df(kge_path, pqr), [cl])
+                        # Get the class embeddings from the model
+                        class_embeddings, classes = get_class_embeddings(get_entity_df(kge_path, pqr), [cl])
 
-                                # Create predictor for the class in question
-                                predict_with_class = lambda h: pred_wrapper(h, class_embeddings, model=pqr_model, pqr=pqr,base_path=kge_path)
+                        # Create predictor for the class in question
+                        predict_with_class = lambda h: pred_wrapper(h, class_embeddings, model=pqr_model, pqr=pqr,
+                                                                    base_path=kge_path)
 
-                                # Get ground truth labels
-                                gt = concept_retrieval(symbolic_kb, OWLClass(classes[0]))
-                                gt_set = set(gt)
+                        # Get ground truth labels
+                        gt = concept_retrieval(symbolic_kb, OWLClass(classes[0]))
+                        gt_set = set(gt)
 
-                                # Give 1 if part of the class, 0 otherwise
-                                labels = np.array([1 if ind in gt_set else 0 for ind in inds])
+                        # Give 1 if part of the class, 0 otherwise
+                        labels = np.array([1 if ind in gt_set else 0 for ind in inds])
 
-                                # Same as above except for with the removed class
-                                tampered_kb = KnowledgeBase(path=path_diminished)
-                                tampered_gt = concept_retrieval(tampered_kb, OWLClass(classes[0]))
-                                tampered_gt_set = set(tampered_gt)
-                                tampered_labels = np.array([1 if ind in tampered_gt_set else 0 for ind in inds])
+                        # Same as above except for with the removed class
+                        tampered_kb = KnowledgeBase(path=path_diminished)
+                        tampered_gt = concept_retrieval(tampered_kb, OWLClass(classes[0]))
+                        tampered_gt_set = set(tampered_gt)
+                        tampered_labels = np.array([1 if ind in tampered_gt_set else 0 for ind in inds])
 
-                                # Discover the position of which individuals were removed
-                                test_set = np.where(labels != tampered_labels)[0]
+                        # Discover the position of which individuals were removed
+                        test_set = np.where(labels != tampered_labels)[0]
 
-                                # Predictions
-                                results = predict_with_class(ind_embeddings)
-                                y_preds = np.argmax(results, axis=1)
+                        # Predictions
+                        results = predict_with_class(ind_embeddings)
+                        y_preds = np.argmax(results, axis=1)
 
-                                # Metrics for all data
-                                recall_val = recall_score(labels, y_preds)
-                                f1_val = f1_score(labels, y_preds)
-                                precision_val = precision_score(labels, y_preds)
-                                accuracy_val = accuracy_score(labels, y_preds)
-                                jaccard_val = jaccard_score(labels, y_preds)
+                        # Metrics for all data
+                        recall_val = recall_score(labels, y_preds)
+                        f1_val = f1_score(labels, y_preds)
+                        precision_val = precision_score(labels, y_preds)
+                        accuracy_val = accuracy_score(labels, y_preds)
+                        jaccard_val = jaccard_score(labels, y_preds)
 
-                                # Metrics for removed individuals only
-                                if len(test_set) == 0:
-                                    # If no removed individuals, fill with NaNs
-                                    tampered_recall = tampered_f1 = tampered_precision = tampered_accuracy = tampered_jaccard = np.nan
-                                else:
-                                    tampered_recall = recall_score(labels[test_set], y_preds[test_set])
-                                    tampered_f1 = f1_score(labels[test_set], y_preds[test_set])
-                                    tampered_precision = precision_score(labels[test_set], y_preds[test_set])
-                                    tampered_accuracy = accuracy_score(labels[test_set], y_preds[test_set])
-                                    tampered_jaccard = jaccard_score(labels[test_set], y_preds[test_set])
+                        # Metrics for removed individuals only
+                        if len(test_set) == 0:
+                            # If no removed individuals, fill with NaNs
+                            tampered_recall = tampered_f1 = tampered_precision = tampered_accuracy = tampered_jaccard = np.nan
+                        else:
+                            tampered_recall = recall_score(labels[test_set], y_preds[test_set])
+                            tampered_f1 = f1_score(labels[test_set], y_preds[test_set])
+                            tampered_precision = precision_score(labels[test_set], y_preds[test_set])
+                            tampered_accuracy = accuracy_score(labels[test_set], y_preds[test_set])
+                            tampered_jaccard = jaccard_score(labels[test_set], y_preds[test_set])
 
-                                # Store results (always, even if NaNs)
-                                results_dict["run"].append(run)
-                                results_dict["dataset"].append(dataset)
-                                results_dict["class_name"].append(class_name)
-                                results_dict["removal"].append(removal)
-                                results_dict["pqr"].append(pqr)
-                                results_dict["all_data_recall"].append(recall_val)
-                                results_dict["all_data_f1"].append(f1_val)
-                                results_dict["all_data_precision"].append(precision_val)
-                                results_dict["all_data_accuracy"].append(accuracy_val)
-                                results_dict["all_data_jaccard"].append(jaccard_val)
-                                results_dict["removed_data_recall"].append(tampered_recall)
-                                results_dict["removed_data_f1"].append(tampered_f1)
-                                results_dict["removed_data_precision"].append(tampered_precision)
-                                results_dict["removed_data_accuracy"].append(tampered_accuracy)
-                                results_dict["removed_data_jaccard"].append(tampered_jaccard)
+                        # Store results (always, even if NaNs)
+                        results_dict["run"].append(run)
+                        results_dict["dataset"].append(dataset)
+                        results_dict["class_name"].append(class_name)
+                        results_dict["removal"].append(removal)
+                        results_dict["pqr"].append(pqr)
+                        results_dict["all_data_recall"].append(recall_val)
+                        results_dict["all_data_f1"].append(f1_val)
+                        results_dict["all_data_precision"].append(precision_val)
+                        results_dict["all_data_accuracy"].append(accuracy_val)
+                        results_dict["all_data_jaccard"].append(jaccard_val)
+                        results_dict["removed_data_recall"].append(tampered_recall)
+                        results_dict["removed_data_f1"].append(tampered_f1)
+                        results_dict["removed_data_precision"].append(tampered_precision)
+                        results_dict["removed_data_accuracy"].append(tampered_accuracy)
+                        results_dict["removed_data_jaccard"].append(tampered_jaccard)
 
-                                # Delete kge_path folder to save space
-                                if os.path.exists(kge_path):
-                                    shutil.rmtree(kge_path)
+                        # Delete kge_path folder to save space
+                        if os.path.exists(kge_path):
+                            shutil.rmtree(kge_path)
 
     # After all loops, create DataFrame once and save
     results_df = pd.DataFrame(results_dict)

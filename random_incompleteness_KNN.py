@@ -293,106 +293,108 @@ if __name__ == "__main__":
                 # Train models on the ontology with the partially removed class
                 path_diminished = f"{base_path}/KGs/{dataset}/{experiment}/{run}/removal_percentage_{removal}/{dataset.lower()}_modified.owl"
 
-                for p in p_s:
-                    for q in q_s:
-                        for r in r_s:
+                for pqr in pqr_list:
+                    p = int(pqr.split("_")[0])
+                    q = int(pqr.split("_")[1])
+                    r = int(pqr.split("_")[2])
 
-                            # Initialize model for this triple (p, q, r)
-                            neural_owl_reasoner = TripleStoreNeuralReasoner(
-                                    path_of_kb=path_diminished,
-                                    gamma=0.5,
-                                    model='DeCaL',
-                                    p=p, q=q, r=r
-                                )
+                    # Initialize model for this triple (p, q, r)
+                    neural_owl_reasoner = TripleStoreNeuralReasoner(
+                        path_of_kb=path_diminished,
+                        gamma=0.5,
+                        model='DeCaL',
+                        p=p, q=q, r=r,
+                        path_to_checkpoint=f"/homes/iroberts/UPB_UBI/checkpoints/{experiment}"
+                    )
 
-                            pqr = f"{p}_{q}_{r}"
-                            kge_path = f"{base_path}/_homes_iKGs_{dataset}_{experiment}_{run}_removal_percentage_{removal}_{dataset.lower()}_modified_{class_name.lower()}_owl_{pqr}"
+                    pqr = f"{p}_{q}_{r}"
+                    kge_path = f"{base_path}/_homes_iroberts_UPB_UBI_KGs_{dataset}_{experiment}_{run}_removal_percentage_{removal}_{dataset.lower()}_modified_owl_{pqr}"
 
-                            # Load model
-                            pqr_model, (_, _) = load_model(path_of_experiment_folder=kge_path)
+                    # Load model
+                    pqr_model, (_, _) = load_model(path_of_experiment_folder=kge_path)
 
-                            # Get the embeddings of the model
-                            _, _, ind_embeddings, inds = process_family_df(get_entity_df(kge_path, pqr))
+                    # Get the embeddings of the model
+                    _, _, ind_embeddings, inds = process_family_df(get_entity_df(kge_path, pqr))
 
-                            # Get the class embeddings from the model
-                            class_embeddings, classes = get_class_embeddings(get_entity_df(kge_path, pqr), classes_of_interest)
+                    # Get the class embeddings from the model
+                    class_embeddings, classes = get_class_embeddings(get_entity_df(kge_path, pqr), classes_of_interest)
 
-                            multi_labels = []
-                            multi_preds = []
-                            for i,cl in enumerate(classes):
-                                # gets name of class → "Brother"
-                                class_name = cl.split("#")[-1]
+                    multi_labels = []
+                    multi_preds = []
+                    multi_tampered_labels = []
+                    for i, cl in enumerate(classes):
+                        # gets name of class → "Brother"
+                        class_name = cl.split("#")[-1]
 
-                                # Create predictor for the class in question
-                                predict_with_class = lambda h: pred_wrapper(h, class_embeddings[i], model=pqr_model, pqr=pqr,base_path=kge_path)
+                        # Create predictor for the class in question
+                        predict_with_class = lambda h: pred_wrapper(h, class_embeddings[i], model=pqr_model, pqr=pqr,
+                                                                    base_path=kge_path)
 
-                                # Get ground truth labels
-                                gt = concept_retrieval(SYMBOLIC_KB, OWLClass(classes[i]))
-                                gt_set = set(gt)
+                        # Get ground truth labels
+                        gt = concept_retrieval(SYMBOLIC_KB, OWLClass(classes[i]))
+                        gt_set = set(gt)
 
-                                # Give 1 if part of the class, 0 otherwise
-                                labels = np.array([1 if ind in gt_set else 0 for ind in inds])
+                        # Give 1 if part of the class, 0 otherwise
+                        labels = np.array([1 if ind in gt_set else 0 for ind in inds])
 
-                                # Same as above except for with the removed class
-                                tampered_kb = KnowledgeBase(path=path_diminished)
-                                tampered_gt = concept_retrieval(tampered_kb, OWLClass(classes[0]))
-                                tampered_gt_set = set(tampered_gt)
-                                tampered_labels = np.array([1 if ind in tampered_gt_set else 0 for ind in inds])
+                        # Same as above except for with the removed class
+                        tampered_kb = KnowledgeBase(path=path_diminished)
+                        tampered_gt = concept_retrieval(tampered_kb, OWLClass(classes[i]))
+                        tampered_gt_set = set(tampered_gt)
+                        tampered_labels = np.array([1 if ind in tampered_gt_set else 0 for ind in inds])
 
-                                # Discover the position of which individuals were removed
-                                test_set = np.where(labels != tampered_labels)[0]
+                        # Predictions
+                        results = predict_with_class(ind_embeddings)
+                        y_preds = np.argmax(results, axis=1)
 
-                                # Predictions
-                                results = predict_with_class(ind_embeddings)
-                                y_preds = np.argmax(results, axis=1)
+                        multi_labels.append(labels)
+                        multi_preds.append(y_preds)
+                        multi_tampered_labels.append(tampered_labels)
 
-                                multi_labels.append(labels)
-                                multi_preds.append(y_preds)
+                    multi_labels = np.stack(multi_labels, axis=1)
+                    multi_preds = np.stack(multi_preds, axis=1)
+                    multi_tampered_labels = np.stack(multi_tampered_labels, axis=1)
 
+                    # Boolean mask of differences
+                    diff_mask = multi_labels != multi_tampered_labels
+                    test_set = np.where(np.any(diff_mask, axis=1))[0]
 
+                    # Compute distance matrices
+                    unsup_dist = pairwise_distances(ind_embeddings, metric="euclidean")
 
-                            # Compute distance matrices
-                            unsup_dist = pairwise_distances(ind_embeddings,metric="euclidean")
+                    # Normalize distances
+                    clifford_dists = unsup_dist / unsup_dist.max()
 
-                            # Normalize distances
-                            clifford_dists = unsup_dist / unsup_dist.max()
+                    neighborhood_values = range(1, int(.25 * len(ind_embeddings)))
+                    for n_val in neighborhood_values:
+                        knn_preds = leave_one_out_ml_knn(clifford_dists, multi_preds, n_neighbors=n_val)
 
+                        hamm_loss_val = hamming_loss(multi_labels, knn_preds),
+                        zero_loss_val = zero_one_loss(multi_labels, knn_preds)
 
-                            neighborhood_values = range(1, int(.25*len(ind_embeddings)))
-                            for n_val in neighborhood_values:
-                                knn_preds = leave_one_out_ml_knn(clifford_dists, multi_preds, n_neighbors=n_val)
+                        # Metrics for removed individuals only
+                        if len(test_set) == 0:
+                            # If no removed individuals, fill with NaNs
+                            tampered_hamm_loss = tampered_zero_loss = np.nan
+                        else:
+                            tampered_hamm_loss = hamming_loss(multi_labels[test_set], knn_preds[test_set]),
+                            tampered_zero_loss = zero_one_loss(multi_labels[test_set], knn_preds[test_set])
 
+                        # Store results (always, even if NaNs)
+                        results_dict["run"].append(run)
+                        results_dict["dataset"].append(dataset)
+                        results_dict["num_neighbors"].append(n_val)
+                        results_dict["removal"].append(removal)
+                        results_dict["pqr"].append(pqr)
+                        results_dict["all_data_hamm_loss"].append(hamm_loss_val)
+                        results_dict["all_data_zero_loss"].append(zero_loss_val)
 
-                                hamm_loss_val = hamming_loss(multi_labels, knn_preds),
-                                zero_loss_val = zero_one_loss(multi_labels, knn_preds)
+                        results_dict["removed_data_hamm_loss"].append(tampered_hamm_loss)
+                        results_dict["removed_data_zero_loss"].append(tampered_zero_loss)
 
-
-
-                                # Metrics for removed individuals only
-                                if len(test_set) == 0:
-                                    # If no removed individuals, fill with NaNs
-                                    tampered_hamm_loss = tampered_zero_loss = np.nan
-                                else:
-                                    tampered_hamm_loss = hamming_loss(multi_labels[test_set], knn_preds[test_set]),
-                                    tampered_zero_loss = zero_one_loss(multi_labels[test_set], knn_preds[test_set])
-
-
-                                # Store results (always, even if NaNs)
-                                results_dict["run"].append(run)
-                                results_dict["dataset"].append(dataset)
-                                results_dict["num_neighbors"].append(n_val)
-                                results_dict["removal"].append(removal)
-                                results_dict["pqr"].append(pqr)
-                                results_dict["all_data_hamm_loss"].append(hamm_loss_val)
-                                results_dict["all_data_zero_loss"].append(zero_loss_val)
-
-                                results_dict["removed_data_hamm_loss"].append(tampered_hamm_loss)
-                                results_dict["removed_data_zero_loss"].append(tampered_zero_loss)
-
-
-                                # Delete kge_path folder to save space
-                                if os.path.exists(kge_path):
-                                    shutil.rmtree(kge_path)
+                        # Delete kge_path folder to save space
+                        if os.path.exists(kge_path):
+                            shutil.rmtree(kge_path)
 
     # After all loops, create DataFrame once and save
     results_df = pd.DataFrame(results_dict)

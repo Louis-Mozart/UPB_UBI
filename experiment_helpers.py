@@ -19,12 +19,8 @@ import numpy as np
 
 from ontolearn.knowledge_base import KnowledgeBase
 from owlapy.class_expression import OWLClass
-
-
-symbolic_kb = KnowledgeBase(path="./KGs/Family/family-benchmark_rich_background.owl")
-
-def concept_retrieval(retriever_func, c):
-    return [i.str for i in retriever_func.individuals(c)]
+from rdflib import Graph, Namespace, URIRef, RDF
+from rdflib.namespace import RDFS, OWL
 
 # Set pandas options to ensure full output
 pd.set_option('display.max_rows', None)
@@ -40,7 +36,7 @@ def load_csv(file_path):
     return pd.read_csv(file_path)
 
 
-def get_entity_df(base_path, pqr, label_na=-1, entity_filter=False):
+def get_entity_df(base_path, label_na=-1, entity_filter=False):
     # File paths
     # base_path = f"./KGs_Family_family-benchmark_rich_background_owl_{pqr}"
     entities_file = f"{base_path}/DeCaL_entity_embeddings.csv"
@@ -49,6 +45,71 @@ def get_entity_df(base_path, pqr, label_na=-1, entity_filter=False):
     # Load entity embeddings and map
     entities_df = load_csv(entities_file)  # First column is URI
     return entities_df
+
+
+def get_class_expressions(dataset):
+    input_owl_path = f"./KGs/{dataset}/{dataset.lower()}.owl"
+    g = Graph()
+    g.parse(input_owl_path, format='xml')
+
+    FAMILY = Namespace(f"http://www.benchmark.org/{dataset.lower()}#")
+    OWL = Namespace("http://www.w3.org/2002/07/owl#")
+
+    # Collect all class types
+    classes = set()
+
+    # Classes explicitly defined as owl:Class
+    for cls in g.subjects(RDF.type, OWL.Class):
+        classes.add(cls)
+
+    # Sometimes classes are only marked as rdfs:Class, so include those too
+    for cls in g.subjects(RDF.type, RDFS.Class):
+        classes.add(cls)
+
+    # Print results
+    unique_classes = []
+    for cls in sorted(classes):
+        unique_classes.append(str(cls))
+
+    return unique_classes
+
+
+def get_individuals(dataset):
+    input_owl_path = f"KGs/{dataset}/{dataset.lower()}.owl"
+
+    g = Graph()
+    g.parse(input_owl_path, format='xml')
+
+    # Collect classes so we can ignore them when listing individuals
+    classes = set(g.subjects(RDF.type, OWL.Class)) | set(g.subjects(RDF.type, RDFS.Class))
+
+    # Collect properties (optional but usually helpful)
+    properties = set(g.subjects(RDF.type, RDF.Property)) | set(g.subjects(RDF.type, OWL.ObjectProperty)) | set(
+        g.subjects(RDF.type, OWL.DatatypeProperty))
+
+    individuals = set()
+
+    # Any subject with a type that isn't a class/property is considered an individual
+    for s, p, o in g.triples((None, RDF.type, None)):
+        if o not in classes and s not in classes and s not in properties and "#" in str(s):
+            individuals.add(s)
+
+    individual_uris = []
+    for i, ind in enumerate(sorted(individuals)):
+        individual_uris.append(str(ind))
+
+    return individual_uris
+
+
+def process_embeddings_df(dataset, df):
+    individual_uris = get_individuals(dataset)
+    class_uris = get_class_expressions(dataset)
+
+    # Filter DataFrame to include only individuals and drop the URI column for embeddings
+    ind_embeddings_df = df[df.iloc[:, 0].isin(individual_uris)].reset_index(drop=True)
+    ind_embeddings = ind_embeddings_df.iloc[:, 1:]
+
+    return individual_uris, class_uris, ind_embeddings.to_numpy(), ind_embeddings_df.iloc[:, 0].to_list()
 
 
 def process_family_df(df):
