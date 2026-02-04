@@ -21,22 +21,22 @@ Different combinations of $(p, q, r)$ induce different algebraic structures and,
 We provide DeepView visualizations for four representative DeCaL configurations on the Family benchmark dataset. Each visualization reveals how entities cluster based on the underlying Clifford algebra structure.
 
 ### DeCaL with $(p=0, q=0, r=0)$
-![DeepView visualization for p=0, q=0, r=0](images/deepview_0_0_0.png)
+<img src="images/deepview_0_0_0.png" width="500" alt="DeepView visualization for p=0, q=0, r=0">
 
 *Embedding space with trivial Clifford structure. This baseline configuration produces embeddings without geometric products from non-trivial basis elements.*
 
 ### DeCaL with $(p=0, q=0, r=1)$
-![DeepView visualization for p=0, q=0, r=1](images/deepview_0_0_1.png)
+<img src="images/deepview_0_0_1.png" width="500" alt="DeepView visualization for p=0, q=0, r=1">
 
 *Embedding space with one degenerate basis vector ($e^2 = 0$). The null element introduces dual-number-like arithmetic, affecting how relations compose.*
 
 ### DeCaL with $(p=0, q=1, r=0)$
-![DeepView visualization for p=0, q=1, r=0](images/deepview_0_1_0.png)
+<img src="images/deepview_0_1_0.png" width="500" alt="DeepView visualization for p=0, q=1, r=0">
 
 *Embedding space with one negative-signature basis vector ($e^2 = -1$). This configuration introduces complex-number-like structure into the embeddings.*
 
 ### DeCaL with $(p=1, q=0, r=0)$
-![DeepView visualization for p=1, q=0, r=0](images/deepview_1_0_0.png)
+<img src="images/deepview_1_0_0.png" width="500" alt="DeepView visualization for p=1, q=0, r=0">
 
 *Embedding space with one positive-signature basis vector ($e^2 = +1$). This split-complex structure enables hyperbolic-like transformations.*
 
