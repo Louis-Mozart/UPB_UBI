@@ -147,6 +147,100 @@ python examples/concept_learning_evaluation_reasoners.py --gamma 0.9 --p 1 --q 1
 
 ---
 
+## Deriving Experiments from Visualizations
+
+The experiments in this repository were derived from insights gained through the **DECAL_visualizations.ipynb** notebook. This notebook uses DeepView to create interactive 2D visualizations of the high-dimensional DeCaL embeddings, enabling human-centered exploration of how different Clifford algebra configurations affect entity clustering and class membership prediction.
+
+The visualizations revealed that:
+- Different $(p, q, r)$ configurations produce distinct embedding geometries
+- Class boundaries vary significantly across configurations
+- Some configurations yield better class separability for certain family relationships
+
+These observations motivated two systematic experiments to quantify the generalization and robustness properties of DeCaL embeddings.
+
+To explore the visualizations yourself:
+
+```bash
+jupyter notebook DECAL_visualizations.ipynb
+```
+
+---
+
+## Experiment 1: Class-Level Generalization
+
+This experiment evaluates how well DeCaL embeddings generalize when class membership information is progressively removed from the knowledge base.
+
+### Running the Experiment
+
+```bash
+python generalization_exp.py
+```
+
+### What It Does
+
+1. **Systematic Class Removal**: For each class of interest (Brother, Mother, Father, etc.), the experiment removes 0%, 5%, 10%, ..., 80% of the `rdf:type` assertions
+2. **Model Training**: Trains DeCaL embeddings on the degraded knowledge base for each $(p, q, r)$ configuration
+3. **Evaluation**: Measures how well the model can still predict class membership for:
+   - All individuals (overall performance)
+   - Removed individuals only (generalization to unseen data)
+
+### Output
+
+Results are saved to `experiment_results/generalization_exp/` as CSV files (one per run).
+
+### Analyzing Results
+
+Open the analysis notebook to visualize performance metrics:
+
+```bash
+jupyter notebook gen_exp_results.ipynb
+```
+
+The notebook:
+- Loads and aggregates results across multiple runs
+- Computes mean and standard deviation for recall, precision, accuracy, and Jaccard scores
+- Generates plots showing performance vs. removal rate for each $(p, q, r)$ configuration
+
+---
+
+## Experiment 2: Random Incompleteness with KNN
+
+This experiment evaluates embedding robustness under random triple removal using multi-label KNN classification.
+
+### Running the Experiment
+
+```bash
+python random_incompleteness_KNN.py
+```
+
+### What It Does
+
+1. **Random Statement Removal**: Removes a percentage of arbitrary triples (not class-specific) from the knowledge base
+2. **Embedding Generation**: Trains DeCaL on the incomplete knowledge base
+3. **Multi-label KNN**: Uses MLkNN to predict class memberships based on embedding similarity
+4. **Evaluation**: Computes Hamming loss and zero-one loss on:
+   - All data (overall performance)
+   - Affected individuals only (robustness to missing information)
+
+### Output
+
+Results are saved to `experiment_results/random_incompleteness_exp/knn_random_incompleteness_results.csv`.
+
+### Analyzing Results
+
+Open the analysis notebook to explore KNN performance:
+
+```bash
+jupyter notebook random_knn_exp_results.ipynb
+```
+
+The notebook:
+- Loads the KNN experiment results
+- Aggregates metrics by neighborhood size and removal rate
+- Analyzes how embedding locality (via KNN) helps recover missing class memberships
+
+---
+
 ## Experiment Results
 
 Results are organized by $(p, q, r)$ configuration in the `Experiments_p_q_r/` directories:
@@ -177,16 +271,24 @@ Experiments_1_1_1/family_gamma_0_5.csv
 ## Project Structure
 
 ```
+├── DECAL_visualizations.ipynb       # DeepView visualization notebook (experiment derivation)
+├── generalization_exp.py            # Experiment 1: Class-level generalization
+├── gen_exp_results.ipynb            # Analysis notebook for Experiment 1
+├── random_incompleteness_KNN.py     # Experiment 2: Random incompleteness with KNN
+├── random_knn_exp_results.ipynb     # Analysis notebook for Experiment 2
+├── experiment_helpers.py            # Helper functions for experiments
 ├── images/                          # DeepView visualizations
 │   ├── deepview_0_0_0.pdf          # Visualization for (p=0,q=0,r=0)
 │   ├── deepview_0_0_1.pdf          # Visualization for (p=0,q=0,r=1)
 │   ├── deepview_0_1_0.pdf          # Visualization for (p=0,q=1,r=0)
 │   └── deepview_1_0_0.pdf          # Visualization for (p=1,q=0,r=0)
-├── Experiments_p_q_r/               # Results for each configuration
-├── KGs_Family_.../                  # Knowledge graphs per configuration
+├── experiment_results/              # Output from experiments
+│   ├── generalization_exp/         # Experiment 1 results (CSV files)
+│   └── random_incompleteness_exp/  # Experiment 2 results (CSV files)
+├── Experiments_p_q_r/               # Concept learning results for each configuration
 ├── examples/                        # Example scripts
 ├── ontolearn/                       # Core library
-└── tests/                           # Unit tests
+└── KGs/                             # Knowledge graphs
 ```
 
 ---
