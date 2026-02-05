@@ -88,7 +88,7 @@ class TripleStoreNeuralReasoner:
                 path_of_kb = f"{path_of_kb}_{self.p}_{self.q}_{self.r}"
                 args.path_to_store_single_run = path_of_kb
                 args.num_epochs = 100
-                args.embedding_dim = 32
+                args.embedding_dim = 64
                 args.batch_size = 1024
                 args.backend = "rdflib"
                 args.trainer = "PL"
