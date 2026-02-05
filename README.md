@@ -53,6 +53,12 @@ unzip KGs.zip
 
 # Unzip the learning problems
 unzip LPs.zip
+
+#install Deepview
+git clone https://github.com/LucaHermes/DeepView.git
+cd DeepView
+pip install ..
+cd..
 ```
 
 Additional datasets and learning problems can be downloaded from [here](https://drive.google.com/file/d/1LWmrtVQFh2_9eWOUsGZTGVeTkxi3n5pk/view?usp=sharing).
